@@ -1,0 +1,21 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: create-netbackup-namespace
+  namespace: argocd  # Adjust to the namespace where Argo CD is installed
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+spec:
+  template:
+    spec:
+      containers:
+        - name: kubectl
+          image: bitnami/kubectl:latest
+          command:
+            - /bin/sh
+            - -c
+            - |
+              kubectl create namespace netbackup-1 || echo "Namespace netbackup-1 already exists"
+      restartPolicy: OnFailure
+  backoffLimit: 4  # Retry up to 4 times if the job fails
